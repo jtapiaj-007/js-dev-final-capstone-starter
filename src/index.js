@@ -158,8 +158,8 @@ function toggleVisibility(hole){
 *
 */
 function updateScore() {
-  // TODO: Write your code here
-
+  points++;
+  score.textContent = points;
   return points;
 }
 
@@ -171,9 +171,8 @@ function updateScore() {
 *
 */
 function clearScore() {
-  // TODO: Write your code here
-  // points = 0;
-  // score.textContent = points;
+  points = 0;
+  score.textContent = points;
   return points;
 }
 
@@ -210,9 +209,7 @@ function startTimer() {
 *
 */
 function whack(event) {
-  // TODO: Write your code here.
-  // call updateScore()
-  return points;
+  return updateScore();
 }
 
 /**
@@ -221,8 +218,9 @@ function whack(event) {
 * for an example on how to set event listeners using a for loop.
 */
 function setEventListeners(){
-  // TODO: Write your code here
-
+  moles.forEach((mole) => {
+    mole.addEventListener('click', whack);
+  })
   return moles;
 }
 
@@ -256,15 +254,24 @@ function stopGame(){
 *
 */
 function startGame(){
-  console.log("Game started...");
-
+  init();
   setDuration(10);
   showUp();
+  setEventListeners();
   return "game started";
 }
 
-startButton.addEventListener("click", startGame);
+/**
+ * This is the function that initialize the game's variables.
+ */
+function init() {
+  time = 0;
+  timer;
+  lastHole = 0;
+  points = 0;
+}
 
+startButton.addEventListener("click", startGame);
 
 // Please do not modify the code below.
 // Used for testing purposes.
