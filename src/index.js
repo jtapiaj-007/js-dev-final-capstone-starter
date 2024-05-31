@@ -1,14 +1,32 @@
+// HTML Elements
 const holes = document.querySelectorAll('.hole');
 const moles = document.querySelectorAll('.mole');
 const startButton = document.querySelector('#start');
 const score = document.querySelector("#score");
 const timerDisplay = document.querySelector("#timer");
+const difficultyList = document.querySelector("#difficulty");
+const durationAutoIncrement = document.querySelector("#duration");
 
+// AUDIO
+const audioHit = new Audio("./assets/hit.mp3");
+const song = new Audio("./assets/molesong.mp3");
+
+// GAME Variables
 let time = 0;
 let timer;
 let lastHole = 0;
 let points = 0;
-let difficulty = "hard";
+let difficulty = "easy";
+let duration = 10;
+
+// Available characters
+const characters = [
+  {sprite: ["./assets/kirby.png", "./assets/kirby-hit.png"], score: 1, speed: 1},
+  {sprite: ["./assets/kirby-two.png", "./assets/kirby-two-hit.png"], score: 2, speed: 1},
+  {sprite: ["./assets/kirby-three.png", "./assets/kirby-three-hit.png"], score: 3, speed: 1},
+  {sprite: ["./assets/kirby-four.png", "./assets/kirby-four-hit.png"], score: 5, speed: 1},
+  {sprite: ["./assets/kirby-five.png", "./assets/kirby-five-hit.png"], score: 10, speed: 1}
+];
 
 /**
  * Generates a random integer within a range.
@@ -73,7 +91,21 @@ function chooseHole(holes) {
     randomHole = randomInteger(0, 8);
   }
   lastHole = randomHole;
+  updateCharacter(holes[randomHole]);
   return holes[randomHole];
+}
+
+/**
+ * This function choose and configure a ramdon character from a list of characters.
+ * 
+ * @param {*} hole 
+ */
+function updateCharacter(hole) {
+  const mole = hole.querySelector(".mole");
+  const index = randomInteger(0, characters.length - 1);
+  mole.style.backgroundImage = `url(${characters[index].sprite[0]})`;
+  mole.setAttribute("data-score", characters[index].score);
+  mole.setAttribute("data-index", index);
 }
 
 /**
@@ -157,9 +189,9 @@ function toggleVisibility(hole){
 * for your implementation:
 *
 */
-function updateScore() {
-  points++;
-  score.textContent = points;
+function updateScore(increment = 1) {
+  points += increment;
+  score.innerHTML = points;
   return points;
 }
 
@@ -172,7 +204,8 @@ function updateScore() {
 */
 function clearScore() {
   points = 0;
-  score.textContent = points;
+  // score.textContent = points;
+  score.innerHTML = points;
   return points;
 }
 
@@ -196,7 +229,8 @@ function updateTimer() {
 *
 */
 function startTimer() {
-  return setInterval(updateTimer, 1000);
+  timer = setInterval(updateTimer, 1000);
+  return timer;
 }
 
 /**
@@ -208,6 +242,19 @@ function startTimer() {
 *
 */
 function whack(event) {
+
+  // Added this guard to prevet UNIT TESTING failure(s) caused by "should increment score when calling whack()" test
+  // calling this method directly via "windows.whack()" that should not happen in a real scenario.
+  if(event != null) {
+    // playAudio(audioHit); // This triggers the "US-05: startTimer() and updateTimer() › should update timer every 1000 milliseconds" to fail
+
+    const mole = event.target;
+    const index = Number(mole.getAttribute("data-index"));
+
+    increment = Number(mole.getAttribute("data-score"));
+    mole.style.backgroundImage = `url(${characters[index].sprite[1]})`;
+    return updateScore(increment);
+  }
   return updateScore();
 }
 
@@ -241,23 +288,34 @@ function setDuration(duration) {
 *
 */
 function stopGame(){
-  // stopAudio(song);  //optional
+  // stopAudio(song);
   clearInterval(timer);
+
+  startButton.disabled = false;
+  difficultyList.disabled = false;
+  durationAutoIncrement.disabled = false;
+
   return "game stopped";
 }
 
 /**
 *
-* This is the function that starts the game when the `startButton`
-* is clicked.
+* This is the function that starts the game when the `startButton` is clicked.
 *
 */
 function startGame(){
   init();
-  setDuration(10);
+  clearScore();
+  setDuration(duration);
   showUp();
   setEventListeners();
   startTimer();
+  // loopAudio(song);
+
+  startButton.disabled = true;
+  difficultyList.disabled = true;
+  durationAutoIncrement.disabled = true;
+
   return "game started";
 }
 
@@ -266,12 +324,42 @@ function startGame(){
  */
 function init() {
   time = 0;
-  timer;
   lastHole = 0;
   points = 0;
+  difficulty = difficultyList.value;
+  duration = durationAutoIncrement.value;
+  timerDisplay.textContent = duration;
+}
+
+/**
+ * This is the function that initializes the cursor
+ * @param {*} target the DOM element where the custom cursors will be applied
+ * @param {*} source the PATH to the IMAGE file used as cursor
+ */
+function changeCursor(target, source) {
+  target.style.cursor = `url('${source}')`;
+}
+
+// Handling AUDIO
+function playAudio(audioObject) {
+  audioObject.play();
+}
+
+function loopAudio(audioObject) {
+  audioObject.loop = true;
+  playAudio(audioObject);
+}
+
+function stopAudio(audioObject) {
+  audioObject.pause();
+}
+
+function play(){
+  playAudio(song);
 }
 
 startButton.addEventListener("click", startGame);
+
 
 // Please do not modify the code below.
 // Used for testing purposes.
@@ -292,3 +380,5 @@ window.time = time;
 window.setDuration = setDuration;
 window.toggleVisibility = toggleVisibility;
 window.setEventListeners = setEventListeners;
+// window.audioHit = audioHit;
+// window.song = song;

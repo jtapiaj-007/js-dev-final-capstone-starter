@@ -278,6 +278,10 @@ describe("US-04 whack()", () => {
     const points = await page.evaluate(() => {
       window.startGame();
       const mole = document.querySelectorAll(".mole")[0];
+
+      // The "data-score" attribute is used to increase points based on character type (windows.character)
+      mole.setAttribute("data-score", 1);
+
       mole.click();
       const points = document.querySelector("#score").innerHTML;
       return points;
