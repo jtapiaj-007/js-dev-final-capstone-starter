@@ -200,8 +200,15 @@ describe("US-03: startGame() and gameOver()", () => {
   });
 
   it('should call showUp() when clicking the start button', async () => {
-    await page.click("button[id=start]");
-    const content = await page.content();
+    const content = await page.evaluate(() => {
+      // This VARIABLE is used to prevent TESTS from trying to reproduce sounds (otherwise DOMException: The element has no supported sources)
+      window.silentMode = true;
+
+      const botton = document.querySelector("button[id=start]");
+      botton.click();
+
+      return document.documentElement.innerHTML;
+    });
     expect(content).toContain('hole show');
   });
 
@@ -275,14 +282,18 @@ describe("US-04 whack()", () => {
   });
 
   it("should increment score when clicking on mole", async () => {
+
     const points = await page.evaluate(() => {
+      // This VARIABLE is used to prevent TESTS from trying to reproduce sounds (otherwise DOMException: The element has no supported sources)
+      window.silentMode = true;
+
       window.startGame();
       const mole = document.querySelectorAll(".mole")[0];
 
-      // The "data-score" attribute is used to increase points based on character type (windows.character)
+      // Implemented functionality to assign different points based on character type, the "data-score" attribute is used for this purpose
       mole.setAttribute("data-score", 1);
-
       mole.click();
+
       const points = document.querySelector("#score").innerHTML;
       return points;
     });

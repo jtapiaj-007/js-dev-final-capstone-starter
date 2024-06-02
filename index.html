@@ -1,9 +1,9 @@
 <html>
   <head>
+    <link rel="icon" href="data:,"> <!-- work around to fix know issue: https://issues.chromium.org/issues/40374731 -->
     <link rel="stylesheet" href="./src/styles.css">
   </head>
   <body>
-    <!-- TODO: choose a more appropriate name-->
     <header>
         <div id="title">Guaca-Mole!</div>
         <h2><span id="timer">0</span> seconds left.</h2>
@@ -31,6 +31,7 @@
         </div>
       </div>
       <div class="grid">
+        <div class="gameover">Game Over!</div>
         <div id="hole0" class="hole">
           <div id="mole0" class="mole"></div>
         </div>
@@ -59,7 +60,6 @@
           <div id="mole8" class="mole"></div>
         </div>
       </div>
-      <!-- <div class="filmscreen"></div> -->
     </div>
     <script src="./src/index.js"></script>
   </body>

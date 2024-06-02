@@ -6,8 +6,9 @@ const score = document.querySelector("#score");
 const timerDisplay = document.querySelector("#timer");
 const difficultyList = document.querySelector("#difficulty");
 const durationAutoIncrement = document.querySelector("#duration");
+const gameoverBanner = document.querySelector(".gameover");
 
-// AUDIO
+// AUDIO files
 const audioHit = new Audio("./assets/hit.mp3");
 const song = new Audio("./assets/molesong.mp3");
 
@@ -19,13 +20,13 @@ let points = 0;
 let difficulty = "easy";
 let duration = 10;
 
-// Available characters
+// Game Characters
 const characters = [
-  {sprite: ["./assets/kirby.png", "./assets/kirby-hit.png"], score: 1, speed: 1},
-  {sprite: ["./assets/kirby-two.png", "./assets/kirby-two-hit.png"], score: 2, speed: 1},
-  {sprite: ["./assets/kirby-three.png", "./assets/kirby-three-hit.png"], score: 3, speed: 1},
-  {sprite: ["./assets/kirby-four.png", "./assets/kirby-four-hit.png"], score: 5, speed: 1},
-  {sprite: ["./assets/kirby-five.png", "./assets/kirby-five-hit.png"], score: 10, speed: 1}
+  {sprite: ["./assets/kirby.png", "./assets/kirby-hit.png"], score: 1},
+  {sprite: ["./assets/kirby-two.png", "./assets/kirby-two-hit.png"], score: 2},
+  {sprite: ["./assets/kirby-three.png", "./assets/kirby-three-hit.png"], score: 3},
+  {sprite: ["./assets/kirby-four.png", "./assets/kirby-four-hit.png"], score: 5},
+  {sprite: ["./assets/kirby-five.png", "./assets/kirby-five-hit.png"], score: 10}
 ];
 
 /**
@@ -103,6 +104,7 @@ function chooseHole(holes) {
 function updateCharacter(hole) {
   const mole = hole.querySelector(".mole");
   const index = randomInteger(0, characters.length - 1);
+
   mole.style.backgroundImage = `url(${characters[index].sprite[0]})`;
   mole.setAttribute("data-score", characters[index].score);
   mole.setAttribute("data-index", index);
@@ -145,7 +147,7 @@ function gameOver() {
 *
 */
 function showUp() {
-  let delay = setDelay(difficulty);
+  const delay = setDelay(difficulty);
   const hole = chooseHole(holes);
   return showAndHide(hole, delay);
 }
@@ -204,7 +206,6 @@ function updateScore(increment = 1) {
 */
 function clearScore() {
   points = 0;
-  // score.textContent = points;
   score.innerHTML = points;
   return points;
 }
@@ -243,16 +244,21 @@ function startTimer() {
 */
 function whack(event) {
 
-  // Added this guard to prevet UNIT TESTING failure(s) caused by "should increment score when calling whack()" test
-  // calling this method directly via "windows.whack()" that should not happen in a real scenario.
-  if(event != null) {
-    // playAudio(audioHit); // This triggers the "US-05: startTimer() and updateTimer() › should update timer every 1000 milliseconds" to fail
+  // TODO: implement a better approach to solve problems caused by JEST TESTs current implementation such as mocking the "playAudio()" and other AUDIO related
+  // functions. This may require changing the jest.config to enable a different testEnvironment (there was a limitation using jest.fn() within the TESTs).
 
+  // Added a guard to prevent FALSE POSITVE caused by JEST TESTs calling "windows.whack()" directly.
+  if(event != null) {
     const mole = event.target;
     const index = Number(mole.getAttribute("data-index"));
 
-    increment = Number(mole.getAttribute("data-score"));
-    mole.style.backgroundImage = `url(${characters[index].sprite[1]})`;
+    // Added a guard to prevent FALSE POSITIVE caused by JEST TEST trying to reproduce sounds (otherwise DOMException is thrown).
+    if(!window.silentMode) {
+      playAudio(audioHit);
+    }
+
+    increment = Number(mole.getAttribute("data-score")); // number of points (depends on the selected character)
+    mole.style.backgroundImage = `url(${characters[index].sprite[1]})`; // changes character's image to simulate being HIT (visual effect)
     return updateScore(increment);
   }
   return updateScore();
@@ -288,13 +294,14 @@ function setDuration(duration) {
 *
 */
 function stopGame(){
-  // stopAudio(song);
   clearInterval(timer);
 
   startButton.disabled = false;
   difficultyList.disabled = false;
   durationAutoIncrement.disabled = false;
+  gameoverBanner.style.visibility = "visible";
 
+  stopAudio(song);
   return "game stopped";
 }
 
@@ -303,18 +310,23 @@ function stopGame(){
 * This is the function that starts the game when the `startButton` is clicked.
 *
 */
-function startGame(){
+function startGame(event) {
   init();
   clearScore();
   setDuration(duration);
   showUp();
   setEventListeners();
   startTimer();
-  // loopAudio(song);
+
+  // Added a guard to prevent FALSE POSITVE caused by JEST TEST trying to reproduce sounds (otherwise DOMException is thrown).
+  if(event != null && !window.silentMode) {
+    loopAudio(song);
+  }
 
   startButton.disabled = true;
   difficultyList.disabled = true;
   durationAutoIncrement.disabled = true;
+  gameoverBanner.style.visibility = "hidden";
 
   return "game started";
 }
@@ -340,22 +352,33 @@ function changeCursor(target, source) {
   target.style.cursor = `url('${source}')`;
 }
 
-// Handling AUDIO
+/**
+ * Plays the audio object passed as parameter.
+ * 
+ * @param {*} audioObject 
+ */
 function playAudio(audioObject) {
   audioObject.play();
 }
 
+/**
+ * Plays the audio object passed as aparemter, and make it repeating again and again (loop).
+ * 
+ * @param {*} audioObject 
+ */
 function loopAudio(audioObject) {
   audioObject.loop = true;
   playAudio(audioObject);
 }
 
+/**
+ * Stops the audio object passed as parameter
+ * 
+ * @param {*} audioObject 
+ */
 function stopAudio(audioObject) {
   audioObject.pause();
-}
-
-function play(){
-  playAudio(song);
+  audioObject.currentTime = 0;
 }
 
 startButton.addEventListener("click", startGame);
@@ -380,5 +403,3 @@ window.time = time;
 window.setDuration = setDuration;
 window.toggleVisibility = toggleVisibility;
 window.setEventListeners = setEventListeners;
-// window.audioHit = audioHit;
-// window.song = song;

@@ -10,9 +10,6 @@ html {
 }
 
 body {
-  /* Make default cursor invisible */
-  /* cursor: none; */
-  /* cursor: url('../assets/cursor-hammer.png'), auto; */
   margin: 0;
 }
 
@@ -93,8 +90,9 @@ h2 {
   border: 3px black solid;
   padding: 5px;
   margin-left: 10px;
-  margin-right: 10px;
+  margin-right: 35px;
   box-shadow: 7px 7px 5px yellow;
+  position: relative;
 }
 
 .hole {
@@ -109,7 +107,7 @@ h2 {
   background-size:contain;
   content:'';
   width: 100%;
-  height: 100%;
+  height: 85%;
   position: absolute;
   bottom: -37%;
   z-index: 2;
@@ -118,7 +116,7 @@ h2 {
 
 .mole {
   background:url('../assets/kirby.png') bottom center no-repeat;
-  background-size: 30%;
+  background-size: 35%;
   position: absolute;
   top: 100%;
   width: 100%;
@@ -128,13 +126,27 @@ h2 {
   pointer-events:auto;
 }
 
-.hit {
-  background-color: aqua;
-}
-
 .hole.show .mole {
   top: 0;
   /*transform: scale(1.1);*/
+}
+
+.gameover {
+  width: 500px;
+  height: 300px;
+  z-index:10;
+  font-size: 50px;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  color: white;
+  background-color:rgba(151, 18, 204, .6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  position: absolute;
+  margin: auto;
+  inset: 0;
+  visibility: hidden;
 }
 
 .logo {
@@ -148,8 +160,7 @@ h2 {
   align-items: center;
   margin: 0 auto;
   background-color: aquamarine;
-  /* width: fit-content; */
-  height: 300px;
+  height: 350px;
 }
 
 .menu div {
