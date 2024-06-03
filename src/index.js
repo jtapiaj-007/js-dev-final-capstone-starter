@@ -29,6 +29,23 @@ const characters = [
   {sprite: ["./assets/kirby-five.png", "./assets/kirby-five-hit.png"], score: 10}
 ];
 
+// Load images/sprites before game starts
+preloadImages();
+
+/**
+ * Preloads all the images/sprites used in the game (characters), before the game starts to prevent
+ * loading time when used for the first time i.e. once loaded, they are cached in local browser.
+ */
+function preloadImages() {
+  characters.forEach((character) => {
+    const normalState = new Image();
+    normalState.src = character.sprite[0];
+
+    const hitState = new Image();
+    hitState.src = character.sprite[1];
+  });
+}
+
 /**
  * Generates a random integer within a range.
  *
@@ -385,7 +402,6 @@ function stopAudio(audioObject) {
 }
 
 startButton.addEventListener("click", startGame);
-
 
 // Please do not modify the code below.
 // Used for testing purposes.
