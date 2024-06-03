@@ -244,8 +244,11 @@ function startTimer() {
 */
 function whack(event) {
 
-  // TODO: implement a better approach to solve problems caused by JEST TESTs current implementation such as mocking the "playAudio()" and other AUDIO related
-  // functions. This may require changing the jest.config to enable a different testEnvironment (there was a limitation using jest.fn() within the TESTs).
+  /*
+  TODO: implement a better approach to solve problems caused by JEST TESTs current implementation such as mocking the "playAudio()"
+  and other AUDIO related functions. This may require changing the jest.config to enable a different testEnvironment (there was a 
+  limitation using jest.fn() within the TESTs).
+  */
 
   // Added a guard to prevent FALSE POSITVE caused by JEST TESTs calling "windows.whack()" directly.
   if(event != null) {
