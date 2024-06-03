@@ -93,6 +93,7 @@ h2 {
   margin-right: 35px;
   box-shadow: 7px 7px 5px yellow;
   position: relative;
+  aspect-ratio: 16 / 9; /* ensures GRID to remain 16:9 ratio when screen is re-sized */
 }
 
 .hole {
